@@ -1,0 +1,259 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[slovene]{babel}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{rotating} 
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage[margin=3cm]{geometry}
+\graphicspath{{./images/}}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\title{Modelska Analiza 1 \\[3mm] \large 1. naloga}
+\author{Luka Papež\\28221030}
+\date{3.\ oktober 2025}
+
+\begin{center}
+    \includegraphics[width=8cm]{logo-fmf.png}
+\end{center}
+
+{
+    \let\newpage\relax
+    \maketitle
+}
+
+\newpage
+\section{Naloga - Model vožnje skozi semafor: variacijska metoda}
+Varčno vožnjo lahko definiramo s pogojem, da je pospeševanja in zaviranja čim manj. To lahko dosežemo z minimizacijo kumulativnega kvadrata pospeška. Iščemo optimalni režim vožnje v situaciji, ko poskušamo razdaljo do semaforja prevoziti ravno v trenutku, ko se prižge zelena luč.
+
+\begin{enumerate}
+    \item Prepišimo problem v brezdimenzijsko obliko.
+    \item Variacijski račun daje možnost, da določimo ekstrem tudi brez enega robnega pogoja: temu je ekvivalentna zahteva
+    \[
+        \frac{\partial L}{\partial \dot{y}} = 0
+    \]
+    v drugi robni točki. Kakšna je torej optimalna vožnja pri poljubni končni hitrosti?
+    \item Kaj dajejo še druge možnosti izbire funkcionala, na primer višje potence absolutne vrednosti pospeška? Zanimiv praktični pomen ima limita, ko gre eksponent proti neskončnosti.
+    \item Kakšna je pa optimalna vožnja, če poleg pospeška tudi velikost hitrosti omejimo s kvadratičnim členom v funkcionalu? Koliko je zdaj prostih parametrov problema?
+    \item Zanimivo je tudi iskanje rešitve za zaporedne semaforje. Kako bi zagotovili zveznost pospeška ob prehodu semaforja?
+\end{enumerate}
+\section{Uvod}
+Kot podano v navodilu naloge, definiramo glavni pogoj varčne vožnje z minimizacijo integrala kvadrata pospeška 
+\begin{equation}
+	\int^{t_0}_0 \dot{v}^2(t)dt = \text{min.},
+\end{equation}
+omejimo še, da se v času $t_0$ prevozi natanko razdalja do semaforja $l=\int^{t_0}_0 v(t)dt$. S pomočjo postopka Lagrangeevih multiplikatorjev nato določimo funkcional
+\begin{equation}
+	\mathcal{L}=\dot{v}^2 - \lambda v.
+	\label{eq:funkcional}
+\end{equation}
+\section{Optimalna vožnja pri poljubni končni hitrosti}
+S funkcionalom v enačbi \eqref{eq:funkcional} in Euler-Lagrangeevo enačbo lahko problem rešimo. Preden izračunamo rešitev pa problem prevedemo še v brezdimenzijsko obliko
+\begin{align}
+	\mathcal{T} &= \frac{t}{t_0} & \mathcal{V} &= \frac{v}{\frac{l}{t_0}} & \mathcal{X} &= \frac{x}{l} \nonumber
+\end{align}
+Nato določimo še robna pogoja $\mathcal{V}(0)=\mathcal{V}_0$ in $\dot{\mathcal{V}}(1)=0$, ki ustrezata poljubni končni hitrosti in tako pridemo do rešitve
+\begin{equation}
+	\mathcal{V}(\mathcal{T}) = \mathcal{V}_0 + \frac{3(1-\mathcal{V}_0)}{2}(2\mathcal{T}-\mathcal{T}^2),
+	\label{eq:sol0}
+\end{equation}
+z integriranjem in odvajanjem dobimo še pozicijo 
+\begin{equation}
+	\mathcal{X(T)}=\mathcal{V}_0\mathcal{T}+\frac{(1-\mathcal{V}_0)}{2}(3\mathcal{T}^2-\mathcal{T}^3)
+\end{equation}
+in pospešek
+\begin{equation}
+	\mathcal{A(T)}=3(1 - \mathcal{V}_0)(1 - \mathcal{T}).
+\end{equation}
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{sol0.pdf}
+	\caption{Od leve proti desni brezdimenzijska pozicija, hitrost in pospešek v odvisnosti od časa, pri različnih vrednostih parametra $\mathcal{V}_0$.}
+\end{figure}
+Iz izračunane rešitve dobimo tri različn tipe rešitev. Najbolj enostaven tip je, ko pospeševanje oziroma zaviranje ni potrebno in se z enakomerno hitrostjo pripeljemo do semaforja ob zeleni luči. Drug tip je, ko linearno pospešujemo oziroma zaviramo, da pravočasno pridemo do semaforja. Tretji tip rešitve pa je za nas nesmiselen, saj v tem primeru prevozimo rdečo luč in se nato k semaforju vrnemo ob zeleni luči, kar je seveda prekršek. To nakazuje na napako v robnem pogoju $l=\int_0^{t_0}v(t)dt$, ki omejuje le končno oddaljenost od začetne pozicije.
+\section{Druge izbire funkcionala}
+Poleg najbolj očitne izbire funkcionala, kjer smo minimizirali kvadrat hitrosti, si lahko izberemo tudi druge vrednosti potence. Očitno so za naš problem smiselne le pozitivne sode vrednosti, s tem definiramo nov funkcional
+\begin{equation}
+	\mathcal{L}=\dot{\mathcal{V}}^{2p}-\lambda \mathcal{V},
+\end{equation}
+kjer je $p$ pozitivno celo število. Ko ga ustavimo v Euler-Lagrangeevo enačbo dobimo
+\begin{equation}
+	2p(2p - 1)(\dot{\mathcal{V}})^{2p - 2}\ddot{\mathcal{V}}+\lambda=0.
+\end{equation}
+Z dvojnim integriranjem tako pridemo do rešitve za brezdimenzionalno hitrost
+\begin{equation}
+	\mathcal{V(T)}=-\frac{2p - 1}{\lambda}\left(\frac{C - \lambda \mathcal{T}}{2p}\right)^{\frac{2p}{2p-1}}+D.
+\end{equation}
+Upoštevamo še robne pogoje enake kot v prejšnjem poglavju in določimo vrednosti konstant
+\begin{align}
+	C &= \lambda, & 
+	D &= \mathcal{V}_0 + \frac{(1-\mathcal{V}_0)(4p - 1)}{2p}, & 
+	\lambda &= 2p\left(\frac{(1-\mathcal{V}_0)(4p-1)}{2p-1}\right)^{2p-1}. 	
+\end{align}
+S tem dobimo končen izraz za hitrost z enim parametrom $\mathcal{V}_0$
+\begin{equation}
+	\mathcal{V}=\mathcal{V}_0 + \frac{(1-\mathcal{V}_0)(4p-1)}{2p}\left(1 - (1 - \mathcal{T})^{\frac{2p}{2p-1}}\right)
+\end{equation}
+Za poljubni $p$ tako poznamo rešitev našega problema. Izračunamo še katere rešitve so veljavne, če ne dopustimo vzvratne vožnje $0<\mathcal{V}$ in tako dobimo omejitev za parameter $0 < \mathcal{V}_0 < \frac{4p-1}{2p-1}$. Opazimo še, da se z večanjem $p$ približujemo enakomernemu pospeševanju, oziroma v limiti $p \to \infty$ se izraz poenostavi v
+\begin{equation}
+	\mathcal{V}=\mathcal{V}_0 + (1-\mathcal{V}_0)\mathcal{T}.
+\end{equation}
+Najvišja vrednost parametra pa se izenači v $\mathcal{V}_0=2$.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=\linewidth]{sol1.pdf}
+	\caption{Od leve proti desni brezdimenzijska pozicija, hitrost in pospešek v odvisnosti od časa, pri $p=3$ in različnih vrednostih parametra $\mathcal{V}_0$.}
+\end{figure}
+V primerjavi z obravnavanimi rešitvami iz prejšnjega poglavja, kjer smo obravnavali primer $p=1$, je hitrost precej bolj linearna, oziroma pospešek bolj konstanten, kar se ujema z ugotovitvijo o limiti.
+\section{Omejitev velikosti hitrosti}
+Za udobno vožnjo je pomembno tudi, da hitrost ni prevelika zato v tem delu omejimo hitrost s kvadratnim členom hitrosti v funkcionalu
+\begin{equation}
+	\mathcal{L}=\dot{v}^2+Cv^2-\lambda v.
+\end{equation}
+Enako kot prej s postopkom preko Euler-Lagrangeeve enačbe dobimo rešitev diferencialne enačbe
+\begin{equation}
+	\mathcal{V}=Ae^{k\mathcal{T}}+Be^{-k\mathcal{T}}+D,
+\end{equation}
+kjer je $k=\sqrt{C}$ in $D=\lambda/2C$. Z enakimi robnimi pogoji kot do sedaj nato določimo konstante
+\begin{align}
+	A &= \frac{k(\mathcal{V}_0-1)}{(1+e^{2k})(k-\tanh{k})}, &
+	B &= e^{2k}A, &
+	D &= \frac{k-\mathcal{V}_0\tanh{k}}{k-\tanh{k}}.
+\end{align}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+    \includegraphics[width=\linewidth]{sol2_k1.pdf}
+    \caption{Parameter $k=1$.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+    \includegraphics[width=\linewidth]{sol2_k10.pdf}
+    \caption{Parameter $k=10$.}
+	\label{im:k10}
+  \end{subfigure}
+	\caption{Grafa brezdimenzionalne hitrosti v odvisnosti od brezdimenzionalnega časa pri določenih vrednosti parametra $k$ in različnih vrednostih parametra $\mathcal{V}_0$.}
+	\label{im:kgraphs}
+\end{figure}
+Iz grafov na sliki \ref{im:kgraphs} je jasno razviden vpliv člena $Cv^2$, ki povzroči močnejše zaviranje v delu, kjer je hitrost večja od $1$. Poleg tega tudi dvigne zgornjo mejo parametra $\mathcal{V}_0$, da je rešitev še veljavna in ne prepeljemo rdeče luči. Poleg tega se zmanjša tudi razpon končnih hitrosti, kar je najbolj jasno razvidno v grafu na sliki \ref{im:k10}. Zanimiva opazka rešitve pa je, da predznak parametra $k$ ni pomemben in je ta simetrična.
+\section{Zaporedni semaforji}
+Za problem zaporednih semaforjev preobrazimo integrale s katerimi definiramo problem. Predpostavimo, da imamo $N$ zaporednih semaforjev na katerih je zelena luč ob $nt_0$ in razdalja med semaforji $l_n$, kjer je $n=1\dots N-1$ indeks semaforja. Zapišemo integrale za čas od $0$ do $Nt_0$ in uvedemo funkcije hitrosti, ki je za prepostost vsaka definirana od časa $0$ do $t_0$
+\begin{align}
+	\int_0^{Nt_0} \dot{v}^2(t)dt = \sum_{n=1}^{N-1}\int_{0}^{t_0} \dot{v}_n^2 (t) &= min., & \int_0^{Nt_0}v(t)dt = \sum_{n=1}^{N-1}\int_{0}^{t_0}v_n(t) &= \sum_{n=1}^{N-1}l_n.
+\end{align}
+Opazimo, da funkcional lahko zapišemo kot $\mathcal{L}=\sum_{n=1}^{N-1}\dot{v}_n^2-\lambda v_n$ za kar pa že poznamo bredimenzionalno rešitev iz problema enega semaforja
+\begin{equation}
+	\mathcal{V}_n(\mathcal{T})=A_n\mathcal{T}^2+B_n\mathcal{T}+C
+\end{equation}
+Najbolj naivno lahko kar vzamemo rešitev s prejšnjimi robnimi pogoji na enačbi \eqref{eq:sol0} in dodamo še en pogoj $\mathcal{V}_n(1)=\mathcal{V}_{n+1}(0)$. S tem dobimo rešitev na sliki \ref{im:naive}. Rešitev je precej pričakovana, namreč poskušamo se čim bolj približati velikosti hitrosti $1$, pri kateri se pripeljemo do semaforja ob prižigu zelene luči brez pospeševanja.
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.95\linewidth]{sol_multiple_naive.pdf}
+    \caption{Graf brezdimenzionalne hitrosti od odvisnosti od brezdimenzionalnega časa za pet semaforjev, kjer črtkana črta označuje prehod semaforja.}
+	\label{im:naive}
+\end{figure}
+Rešitev ni optimalna, saj zahteva kar precej voznih sposobnosti ob prehodu semaforjev zaradi nezveznosti pospeška. Zato se vrnimo na rešitev diferencialne enačbe
+\begin{equation}
+	\mathcal{V}_n=A_n\mathcal{T}^2+B_n\mathcal{T}+C_n
+\end{equation}
+in definirajmo robne pogoje
+\begin{align}
+	\mathcal{V}_n(1) &= \mathcal{V}_{n+1}(0), & \dot{\mathcal{V}}_n(1) &= \dot{\mathcal{V}}_{n+1}(0), & \int_0^1\mathcal{V}_nd\mathcal{T}&=1, & \mathcal{V}_1(0)=\mathcal{V}_0,
+\end{align}
+ki veljajo, če je med vsemi semaforji razdalja $l$.
+Tako imamo $3N$ spremenljivk in $3N-1$ enačb zato potrebujemo definirati še en robni pogoj, ki ga vzamemo iz prejšnjih poglavji in sicer, da velja $\dot{\mathcal{V}}_N(1) = 0$. Tako definiramo sledeči sistem enačb
+\begin{align*}
+	C_1 &= \mathcal{V}_0 \\
+	2A_N + B_N &= 0 \\
+	2A_n+B_n-B_{n+1} &= 0 \\
+	A_n + B_n + C_n - C_{n+1} &= 0 \\
+	2A_n + 3B_n + 6C_n &= 6,
+\end{align*}
+ki nato za $N=2$ tvori matrični sistem
+\[
+\begin{bmatrix}
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 2 & 1 & 0 \\
+2 & 3 & 6 & 0 & 0 & 0 \\
+2 & 1 & 0 & 0 & -1 & 0 \\
+1 & 1 & 1 & 0 & 0 & -1 \\
+0 & 0 & 0 & 2 & 3 & 6 \\
+\end{bmatrix}
+\begin{bmatrix}
+A_1 \\ B_1 \\ C_1 \\ A_2 \\ B_2 \\ C_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathcal{V}_0 \\ 0 \\ 6 \\ 0 \\ 0 \\ 6
+\end{bmatrix}.
+\]
+S funkcijo \texttt{numpy.linalg.solve} v Pythonu lahko nato rešimo sistem za poljuben $N$. Na sliki \ref{im:multiple_sol} nato pridemo do zvezno odvedljive rešitve, ki je pojemajoča oscilacija okoli $\mathcal{V}=1$.
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.95\linewidth]{sol_multiple.pdf}
+	\caption{Zvezno odvedljiva rešitev brezdimenzionalne hitrosti v odvisnosti od brezdimenzionalnega časa za pet semaforjev z enakimi časi prižgane zelene luči, kjer črtkana črta označuje prehod semaforja.}
+	\label{im:multiple_sol}
+\end{figure}
+Pri postavljanju semaforjev pa se pogosto znajdemo v obratni dilemi, ker želimo, da voznik prepelje čim več semaforjev ne, da preseže omejitev hitrosti. Zanima nas torej koliko je najvišja hitrost, ki jo mora voznik doseči, da prepelje zadnji semafor v trenutku, ko se na njem prižge rdeča luč. Recimo, da voznik stoji pred prvim semaforjem, ko se na vseh semaforjih prižge zelena luč. Če bi vsi semaforji imeli enak $t_0$ in $l$ se problem poenostavi na reševanje le zadnjega semaforja, ki ga želimo prevoziti z razdaljo $Nl$, kjer je $N$ število semaforjev po prvem. Za ta problem konstruiramo matriko
+\[
+\begin{bmatrix}
+0 & 0 & 1 \\
+2 & 1 & 0 \\
+2 & 3 & 6 \\
+\end{bmatrix}
+\begin{bmatrix}
+A_1 \\ B_1 \\ C_1
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathcal{V}_0 \\ 0 \\ 6N
+\end{bmatrix}
+\]
+in izračunamo kakšna minimalna omejitev hitrosti je potrebna za vsako število semaforjev:
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline
+		$N$ & $\mathcal{V}_{max}$ \\
+		\hline
+		1 & 1.5 \\
+		2 & 3.0 \\
+		3 & 4.5 \\
+		4 & 6.0 \\
+		5 & 7.5 \\
+		6 & 9.0 \\
+		7 & 10.5 \\
+		8 & 12.0 \\
+		9 & 13.5 \\
+		10 & 15.0 \\
+		\hline
+	\end{tabular}
+	\caption{Tabela minimalnih omejitev hitrosti z $N$ semaforjev.}
+\end{table}
+Bolj zanimivo vprašanje pa je Mikijeva drzna igra z življenjem, kjer zapelješ čez vsak semafor v trenutku, ko se na njem prižge rdeča luč. Vsak semafor ima naključno znano dolžino prižgane luči $t_n$ v intervalu $[0.1, 1]$. Za reševanje potrebujemo najprej umakniti našo poenostavitev, da je čas vseh lokalnih rešitev hitrosti na intervalu od $0$ do $1$ in na novo zastaviti robne pogoje 
+\begin{align}
+	\mathcal{V}_n(\mathcal{T}_n) &= \mathcal{V}_{n+1}(\mathcal{T}_n), & \dot{\mathcal{V}}_n(\mathcal{T}_n) &= \dot{\mathcal{V}}_{n+1}(\mathcal{T}_n), & \sum_{k=1}^n\int_{\mathcal{T}_{k-1}}^{\mathcal{T}_k}\mathcal{V}_k d\mathcal{T} &= n, & \mathcal{V}_1(0) &= \mathcal{V}_0, & \dot{\mathcal{V}}_n(\mathcal{T}_N) &= 0,
+\end{align}
+kjer velja $\mathcal{T}_n=\sum_{k=1}^{n}t_n/t_0$. Z enakim postopkom kot prej konstruiramo in rešimo matrični sistem enačb. Primer rešitve je na sliki \ref{im:sol_extra}, kjer je ponovno nekaj neveljavnih rešitev. Zanimiva opazka pa je, da se vpliv začetne hitrosti porazgubi po približno petih semaforjih in rešitve postanejo degenerirane. Ta lastnost pa se tudi ohranja čez različne rešitve. Taka rešitev pa nam tudi omogoči, da preizkusimo kako se mora vozilo obnašati pri specifičnih intervalih, da mu ravno uspe priti čez vse semaforje in poiščemo take, ki so najbolj ustrezni.
+\begin{figure}[H]
+	\centering
+    \includegraphics[width=0.95\linewidth]{sol_extra0.pdf}
+	\caption{Zvezno odvedljiva rešitev brezdimenzionalne hitrosti v odvisnosti od brezdimenzionalnega časa za šest semaforjev z naključnimi časi prižgane zelene luči, kjer črtkana črta označuje prehod semaforja.}
+	\label{im:sol_extra}
+\end{figure}
+\section{Zaključek}
+V tej nalogi smo se spoznali z uporabo variacijske metode na podlagi vsakdanjega problema udobne vožnje pri prehodu semaforja. Raziskali smo primere z omejevanjem hitrosti, pospeška in primer več zaporednih semaforjev. Obstaja še veliko možnosti za dodatno raziskovanje kot bolj strogo omejevanje hitrosti ali reševanje brez neveljavnih rešitev. Zanimiv primer dejanske analize/optimizacije semaforjev pa je v članku \href{https://www.nature.com/articles/s41467-024-45427-4}{``Traffic light optimization with low penetration rate vehicle trajectory data''}, kjer z malo podatki o prometu brez senzorjev zagotavljajo učinkovito delovanje semaforjev.
+\end{document}
