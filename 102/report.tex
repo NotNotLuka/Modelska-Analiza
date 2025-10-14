@@ -1,0 +1,237 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[slovene]{babel}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{rotating} 
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage[margin=3cm]{geometry}
+\graphicspath{{./images/}}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\title{Modelska Analiza 1 \\[3mm] \large 2. naloga}
+\author{Luka Papež\\28221030}
+\date{12.\ oktober 2025}
+
+\begin{center}
+    \includegraphics[width=8cm]{logo-fmf.png}
+\end{center}
+
+{
+    \let\newpage\relax
+    \maketitle
+}
+
+\newpage
+\section{Naloga - Linearno Programiranje}
+Med tipične primere, ki jih lahko učinkovito rešimo z metodami linearnega programiranja, sodi sestavljanje diet za hujšanje, zdravljenje ali športne aktivnosti. Za dani nabor živil določamo njihove količine, pri čemer moramo zadostiti različnim omejitvam. Med drugim moramo zagotoviti priporočene dnevne odmerke mineralov, vitaminov in hranilnih snovi, omejiti pri vnos maščob, ogljikovih hidratov ter telesu škodljivih snovi, hkrati pa zagotoviti, da energijska vrednost ustreza zahtevam posameznika. Vnos vsake izmed hranilnih snovi je linearna funkcija količin živil in je natanko določena z njihovo sestavo. Od vrste diete pa je odvisno, katere parametre omejimo in katere minimiziramo.
+
+Datoteka \texttt{tabela-zivil.dat} vsebuje podatke o energijski vrednosti ter vsebnosti maščob, ogljikovih hidratov, proteinov, kalcija in železa v nekaj živilih, skupaj z okvirnimi podatki o njihovi ceni.
+
+\begin{enumerate}
+  \item Minimiziraj količino kalorij, če je priporočen minimalni dnevni vnos $70$~g maščob, $310$~g ogljikovih hidratov, $50$~g proteinov, $1000$~mg kalcija ter $18$~mg železa. Dnevni obroki naj količinsko ne presežejo dveh kilogramov hrane. Upoštevate lahko še minimalne vnose za vitamin~C ($60$~mg), kalij ($3500$~mg) in sprejemljiv interval za natrij ($500$~mg -- $2400$~mg), ki so tudi na voljo v tabeli.
+  \item Kako se rezultat razlikuje, če zahtevamo minimalno $2000$~kcal in namesto energije minimiziramo vnos maščob?
+  \item Namesto kalorij minimiziraj še ceno. Kako se varčevanje odraža na zdravi prehrani?
+  \item Ker rešujemo poenostavljen problem z malo parametri na živilo, so lahko rezultati nerealistični. Lahko z omejitvijo količine posameznih živil v obroku izboljšaš uravnoteženost prehrane? Poskusiš lahko tudi poiskati podatke o drugih mineralih in hranilih ter s tem izboljšati model.
+\end{enumerate}
+\section{Minimizacija hranil in drugih količin}
+Linearno programiranje definiramo kot reševanje problemov, ki jih lahko zapišemo v naslednji obliki:
+\[
+\begin{array}{ll}
+\text{Najdi vektor} & \mathbf{x}, \\
+\text{ki minimizira} & \mathbf{c}^\top \mathbf{x} \\
+\text{pod pogojem} & A\mathbf{x} \le \mathbf{b}, \\
+\text{in} & \mathbf{x} \ge 0,
+\end{array}
+\]
+kjer sta $\mathbf{c}$ in $\mathbf{b}$ podana vektorja in $A$ podana matrika. Problem minimiziranja kalorij z minimalnim dnevnim vnosom tak prepišemo v prejšnjo obliko. To storimo tako, da vsako živilo, za katerega imamo podatke, predstavlja eno dimenzijo. Minimizacijo pa določimo tako, da vsak koeficient v vektorju $\mathbf{c}$ predstavlja število željene količine na gram živila. Enako storimo s pogoji minimalnega in maksimalnega vnosa s katerimi konstruiramo matriko $A$ in vektorj $\mathbf{b}$. Problem lahko nato rešimo s pomočjo funkcije \texttt{scipy.optimize.linprog}. 
+\subsection{Minimizacija kalorij in maščob}
+S podanimi podatki o živilih lahko za minimizacijo kalorij izpolnimo vse določene pogoje z najmanj $1297$~kcal. A hitro opazimo, da so pridobljena živila precej nenavadna, saj kar $89$\% celotne prehrane predstavljata radenska in kakav.  Visoko prisotnost kakava lahko pojasnimo s tem, da opazimo, da je živilo, ki ima najvišjo prisotnost proteinov in oglijkovih hidratov. S tem pojasnimo tudi presežek kalija, ki ga je v kakavu na gram približno $4\%$ potrebne doze kar je precej veliko v primerjavi z oglijkovimi hidrati, ki jih je le približno $0.2\%$. Visoko prisotnost radenske pa izvira v razlogu, da ima $0$~kcal in dopolni manjkajočo vsebnost kalcija, ki je v rešitvi točno na definirani minimalni dozi. 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.42\textwidth}
+		\includegraphics[width=\linewidth]{task1p.pdf}
+		\caption{Procentualna porazdelitev zaužitih živil.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{task1slack.pdf}
+		\caption{Presežek minimalnih vrednosti hranil, presežek manjkajočih hranil je enak $0$.}
+	\end{subfigure}
+	\caption{Procentualna porazdelitev in presežek minimalnih vrednosti hranil za minimiziranje zaužitih kalorij.}
+	\label{fig:calories}
+\end{figure}
+Ob natančnejšem pregledu presežkov zastavljenih minimalnih vrednosti opazimo, da je na mejni vrednosti natrij, presežemo tudi priporočeno minimalno dozo železa skoraj trikrat, kar je po različnih virih še znotraj sprejemljivih intervalov. Pretentati pa nas ne sme nizek relativni presežek kalija, ki preseže maksimalno sprejemljivo dozo za približno $3000$~mg. Precej presenetljiv pa je tudi presežek proteinov, ki ga sicer ne bi pričakovali, a izvira iz razmerja, razmerja proteinov od potrebne doze in ogljikovih hidratov od potrebne doze, v kakavu, ki ima vrednost $2.24$, kar se ujema s presežkom.
+
+Naslednji smiselni korak je, da dodamo še zgornjo mejo za kalij, ki jo postavimo na $5000$~mg. S to omejitvijo precej izboljšamo porazdelitev živil. Masa kakava kot radenske se več kot razpolovi. Poveča pa se vsebnost marmelade, vlogo glavnega živila pa prevzame solata. Pojavita se tudi dve novi živili in sicer sir edamec in pomfri.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.42\textwidth}
+		\includegraphics[width=\linewidth]{task1potp.pdf}
+		\caption{Procentualna porazdelitev zaužitih živil.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{task1potslack.pdf}
+		\caption{Presežek minimalnih vrednosti hranil, presežek manjkajočih hranil je enak $0$.}
+	\end{subfigure}
+	\caption{Procentualna porazdelitev in presežek minimalnih vrednosti hranil za minimiziranje zaužitih kalorij.}
+\end{figure}
+V zdravi prehrani si ljudje pogosto želijo zmanjšati količino maščob v prehrani. Zato zamenjamo vlogi maščob in kalorij in kalorijam dodamo omejitev $2000$~kcal. Najboljša izbira za podan nabor živil vrne $7.4$~g maščob. To tudi izrine kakav, ki vsebuje precej maščob in ga nadomesti s fižolem, belim kruhom. Prvič opazimo med živili v rešitvi tudi meso in sicer purana, a je procent še vedno zanemarljiv. Z bolj raznoliko prehrano se tudi izrine potreba po radenski, saj lahko tokrat nadomestimo kalij s solato, ker ni več potrebe po minimiziranju kalorij. 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.42\textwidth}
+		\includegraphics[width=\linewidth]{task2p.pdf}
+		\caption{Procentualna porazdelitev zaužitih živil.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{task2slack.pdf}
+		\caption{Presežek minimalnih vrednosti hranil, presežek manjkajočih hranil je enak $0$.}
+	\end{subfigure}
+	\caption{Procentualna porazdelitev in presežek minimalnih vrednosti hranil za minimiziranje zaužitih maščob.}
+\end{figure}
+\subsection{Cena in zdrava prehrana}
+Zdrava prehrana je kompleksen izraz, ki lahko pomeni marsikaj. Vzemimo primera iz prejšnjega podpoglavja maščobe in kalorij, za enega nastavimo fiksno spodnjo mejo za drugega pa enakost, ki jo zvišujemo, ob teh pogojih pa miniziramo ceno.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\linewidth]{energija.pdf}
+		\caption{Minimalna cena v odvisnosti od kalorij s $70$~g maščob.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.45\textwidth}
+		\includegraphics[width=\linewidth]{mascobe.pdf}
+		\caption{Minimalna cena v odvisnosti od maščob z $2000$~kcal.}
+	\end{subfigure}
+	\caption{Minimiziranje cene v odvisnosti od energije in maščob.}
+\end{figure}
+Za maščobe kot za kalorije dobimo precej podoben rezultat. Razvijejo se tri območja, eksponento padanje cene, konstanta cena in linearno naraščanje cene. Najprej cena eksponentno pada, saj je s strogo omejitvijo maščob in kalorij težko izpolniti vse ostale pogoje za minimalni dnevni vnos in potrebujemo zato kupovati živila z visoko vsebnostjo drugih hranil. Nato se cena ustali, saj dosežemo pričakovani vnos glede na ostale vrednosti. V območju linearnega naraščanja pa so vsi ostali pogoji že izpolnjeni zato program le povečuje prisotnost živila z najboljšjim razmerjem med ceno in kalorijami oziroma maščobami.
+
+
+Za zdrav obrok pa bi želeli minimizirati ceno, maščobe in maksimizirati proteine. To lahko storimo tako, da utežimo ceno na gram $c$, maščobe na gram $m$ in proteine na gram $p$ in definiramo koeficiente na naslednji način
+\begin{equation*}
+	\min_{x} \sum_i (w_{cena}c_i + w_{mascobe}m_i - w_{proteini}p_i)x_i.
+\end{equation*}
+Za namene našega problema uteži definiramo tako, da vsako izmed vrednosti normaliziramo z največjo vrednostjo in tako izenačimo pomen vseh treh spremenljivk.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.42\textwidth}
+		\includegraphics[width=\linewidth]{task3hp.pdf}
+		\caption{Procentualna porazdelitev zaužitih živil.}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{task3hslack.pdf}
+		\caption{Presežek minimalnih vrednosti hranil, presežek manjkajočih hranil je enak $0$.}
+	\end{subfigure}
+	\caption{Procentualna porazdelitev in presežek minimalnih vrednosti hranil za minimiziranje cene, maščob in maksimiziranje proteinov.}
+\end{figure}
+Glavno živilo v tej konfiguraciji je tuna. Tu se seveda vprašamo zakaj ne kakšno drugo meso in izkaže se, da ima tuna skoraj dvakrat več proteinov glede na ceno in približno le tretjino maščob v primerjavi z govedino in svinjino. Velika količina zaužitega mesa pa povzroči zelo hud preseg mineralov. Tudi kalcija, ki ga je bilo potrebno pri drugih konfiguracijah dopolnjevati z radensko ali solato.
+\section{Uravnotežena prehrana}
+V prejšnjih poglavjih smo opazili, da z reševanjem z linearnim programiranjem pogosto dominira eno živilo, da se izpolnejo vsi pogoji. Poleg tega dobimo precej nesmiselne rešitve, saj nekatera živila vedno jemo z drugimi, kot recimo kakav z mlekom. Vsak gram kakava potrebuje $k$ gramov mleka, kar nam da pogoj
+\begin{align*}
+	kx_{\text{kakav}} - x_{\text{mleko}} &= 0.
+\end{align*}
+A kmalu se problem zakomplicira, saj so nekatera živila zelo pogosta. Na primer, če imamo naslednji primer
+\begin{align*}
+	4x_{\text{kakav}} - x_{\text{mleko}} &= 0, \\
+	5x_{\text{kosmici}} - x_{\text{mleko}} &= 0.
+\end{align*}
+Te dva razmerja med živili povzročijo, da prisotnost kakava poveča prisotnost mleka, kar poveča prisotnost kosmičev. V izogib temu pojavu enačbe definiramo le za tista živila, ki jih ne jemo posamezno. Na primer kosmičev ne bi jedli brez $k_m$ gramov mleka ali $k_j$ gramov jogurta, mleko in jogurt pa jemo tudi brez kosmičev. Torej v našem jedilniku potrebujemo več mleka in jogurta kolikor ga potrebujemo za kosmiče. Tako lahko ustvarimo naslednji pogoj za primer
+\begin{equation*}
+	x_{\text{kosmici}} - \sum_{i\in \mathcal{I}} k_i \, x_i < 0,
+\end{equation*}
+kjer je $\mathcal{I} = \{\text{mleko, jogurt}\}$. Rešitev ni povsem idealna, saj je lahko razmerje izpolnjeno tudi, če je na primer mleko uporabljeno v nekem drugem razmerju, a je še vedno dober približek, ki nam, da bolj zanimive rešitve. V tabeli \ref{tab:ratios} je podanih nekaj primerov uporabljenih razmerji med živili.
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|c|}
+\hline
+\textbf{Živilo 1} & \textbf{Živilo 2} & \textbf{Razmerje [g/g]} \\
+\hline
+Ovseni kosmiči   & Mleko            & 40 / 150 \\
+Ovseni kosmiči   & Banana           & 40 / 50  \\
+Polnozrnat kruh  & Sir edamec       & 60 / 30  \\
+Beli kruh        & Marmelada        & 60 / 15  \\
+Jajce            & Beli kruh        & 50 / 60  \\
+Paradižnik       & Polnozrnat kruh  & 50 / 60  \\
+Jajce            & Sir edamec       & 50 / 20  \\
+Jogurt           & Ovseni kosmiči   & 150 / 40 \\
+Govedina         & Riž              & 200 / 175 \\
+\hline
+\end{tabular}
+\caption{Razmerja med živili v obrokih}
+\label{tab:ratios}
+\end{table}
+Živilom v podanih podatkih dodamo še kategorijo hrane kateri pripadajo. S tem si omogočimo, da pogojimo še razmerja med različnimi vrstami hrane. Za nadaljno obravno uvedemo kategorije hrane in razmerja med njimi kot je napisano v tabeli \ref{tab:skupine}. 
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|c|}
+	\hline
+	\textbf{Skupina živil} & \textbf{Število živil} \\
+	\hline
+	Sadje in zelenjava & 20 \\ \hline
+	Beljakovine        & 12 \\ \hline
+	Sladkarije         & 8 \\ \hline
+	Žita               & 6 \\ \hline
+	Mlečni izdelki     & 5 \\ \hline
+	Pijače             & 4 \\ \hline
+	\end{tabular}
+	\caption{Število živil po skupinah}
+	\label{tab:skupine}
+\end{table}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{food_ratiosp.pdf}
+		\caption{S pogoji razmerji med posameznimi živili.}
+		\label{fig:food_ratio}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{group_ratiosp.pdf}
+		\caption{S pogoji razmerji med kategorijami hrane.}
+		\label{fig:type_ratio}
+	\end{subfigure}
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{groupfodie_ratiosp.pdf}
+		\caption{S pogoji razmerji med kategorijami hrane in posameznimi živili.}
+		\label{fig:all_ratio}
+	\end{subfigure}
+	\caption{Procentualna porazdelitev za minimiziranje maščob ob razmernih pogojih.}
+\end{figure}
+S postavljenimi pogoji za razmerja med različnimi živili na sliki \ref{fig:food_ratio} dosežemo predvsem, da program poišče živila, ki nimajo postavljenih pogojev o razmerjih. Že samo pogoji o razmerjih kategorij hrane iz slike \ref{fig:type_ratio} pa nam vrne kar precej uravnotežen nabor živil. Z uporabo obeh pogojev na sliki \ref{fig:all_ratio} pa pridejo do izraza tudi pogoji razmerji med posameznimi živili kot na primer med prejšnjim primerom ovsenimi kosmiči ter mlekom in jogurtom. Za konec poskusimo s tem algoritmom sestaviti še nekaj različnih naborov živil tako, da odstranjujemo živila iz trenutne rešitve. To se je zaradi majhnega nabora živil v podanih tabelah izkazalo za le delno uspešno, saj so nekatera živila kot na primer radenska ključna za izpolnitev pogojev. Še nekaj tako konstruiranih rešitev je na slikah \ref{fig:alt}.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{eradicate0p.pdf}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{eradicate2p.pdf}
+	\end{subfigure}
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{eradicate5p.pdf}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.48\textwidth}
+		\includegraphics[width=\linewidth]{eradicate8p.pdf}
+	\end{subfigure}
+	\caption{Procentualna porazdelitev za minimiziranje maščob ob razmernih pogojih.}
+	\label{fig:alt}
+\end{figure}
+\section{Zaključek}
+V tej nalogi smo se spoznali z osnovami uporabe linearnega programiranja na podlagi reševanja problemov o prehrani. Zanimiva bi bila tudi bolj teoretična obravnava linearnega programiranja s katerim bi lahko tudi poskušali podati napovedi kako se minimum spreminja glede na spremembo mej. Dodatno bi lahko poskušali tudi še linearizirati nelinearne pogoje in jih nato reševati na veljavnih območjih.
+\end{document}
