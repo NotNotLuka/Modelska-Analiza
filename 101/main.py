@@ -113,40 +113,37 @@ def limit_v(filename):
     fig.savefig(f"images/{filename}")
 
 
-def derivative_eq(n, N):
-    line = []
-    for _ in range(n):
-        line += [0, 0, 0]
-    line += [2, 1, 0, 0, -1, 0]
-    for _ in range(n + 2, N):
-        line += [0, 0, 0]
-
-    return line
-
-
-def continuity_eq(n, N):
-    line = []
-    for _ in range(n):
-        line += [0, 0, 0]
-    line += [1, 1, 1, 0, 0, -1]
-    for _ in range(n + 2, N):
-        line += [0, 0, 0]
-
-    return line
-
-
-def distance_eq(n, N):
-    line = []
-    for _ in range(n):
-        line += [0, 0, 0]
-    line += [2, 3, 6]
-    for _ in range(n + 1, N):
-        line += [0, 0, 0]
-
-    return line
-
-
 def get_parameters(N, v0):
+    def derivative_eq(n, N):
+        line = []
+        for _ in range(n):
+            line += [0, 0, 0]
+        line += [2, 1, 0, 0, -1, 0]
+        for _ in range(n + 2, N):
+            line += [0, 0, 0]
+
+        return line
+
+    def continuity_eq(n, N):
+        line = []
+        for _ in range(n):
+            line += [0, 0, 0]
+        line += [1, 1, 1, 0, 0, -1]
+        for _ in range(n + 2, N):
+            line += [0, 0, 0]
+
+        return line
+
+    def distance_eq(n, N):
+        line = []
+        for _ in range(n):
+            line += [0, 0, 0]
+        line += [2, 3, 6]
+        for _ in range(n + 1, N):
+            line += [0, 0, 0]
+
+        return line
+
     matrix = []
     b = [v0, 0]
     matrix.append([0, 0, 1] + [0 for i in range(3, 3 * N)])
@@ -372,4 +369,4 @@ def multiple_extra(filename):
 # draw_multiple_naive("sol_multiple_naive.pdf")
 # multiple("sol_multiple.pdf")
 # extra()
-multiple_extra("sol_extra1.pdf")
+# multiple_extra("sol_extra1.pdf")

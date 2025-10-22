@@ -1,0 +1,307 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[slovene]{babel}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{rotating} 
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage[margin=3cm]{geometry}
+\graphicspath{{./images/}}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\title{Modelska Analiza 1 \\[3mm] \large 3. naloga}
+\author{Luka Papež\\28221030}
+\date{}
+
+\begin{center}
+    \includegraphics[width=8cm]{logo-fmf.png}
+\end{center}
+
+{
+    \let\newpage\relax
+    \maketitle
+}
+
+\newpage
+\section{Naloga - Numerična minimizacija}
+\begin{enumerate}
+    \item \textbf{Thomsonov problem:}  
+    Na prevodno kroglo nanesemo $N$ enakih (klasičnih) nabojev.  
+    Kako se razmestijo po površini? Zahtevamo seveda minimum elektrostatične energije.  
+    Primerjaj učinkovitost in natančnost za različne minimizacijske metode, npr. Powellovo ali 
+    $n$-dimenzionalni simpleks (amebo oz. Nelder–Mead).
+
+    \item \textbf{Problem optimalne vožnje skozi semafor:}  
+    Problem, ki smo ga spoznali pri nalogi 1, lahko rešujemo tudi z numerično minimizacijo, 
+    če časovno skalo diskretiziramo.  
+
+    Lagrangianu 
+    \[
+        \int \left( \frac{dv}{dt} \right)^2 dt - 
+        \lambda \int v \, dt
+    \]
+    lahko dodamo omejitev hitrosti v obliki členov 
+    \[
+        e^{\beta (u - u_{\text{lim}})},
+    \]
+    če hočemo (približno) zagotoviti $u \le u_{\text{lim}}$.  
+    Izpolnitev pogoja je toliko ostrejša, kolikor večji $\beta$ vzamemo.  
+    Poskusiš lahko tudi druge omejitvene funkcije, na primer kakšno funkcijo s polom.
+
+    Za iskanje Lagrangeovega multiplikatorja lahko uporabiš bisekcijo ali kakšno drugo vgrajeno 
+    metodo za iskanje ničel na funkciji
+    \[
+        l(\lambda) = \int v(\lambda, t) \, dt,
+    \]
+    kjer je $v(\lambda, t)$ rezultat minimizacije pri izbranem $\lambda$.  
+    V tem primeru je enakost izpolnjena eksaktno.
+\end{enumerate}
+\section{Thomsonov problem}
+Kot že opisano v nalogi rešujemo Thomsonov problem, pri katerem iščemo minimum elektrostatične energije glede na razporeditev nabojev na sferi. Za problem imamo $3N$ parameterov z $N$ vezmi
+\begin{equation*}
+	x_n^2 + y_n^2 + z_n^2 = 1,
+\end{equation*}
+kjer so $x_n$, $y_n$ in $z_n$ koordinate $n$-tega elektrona. Definiramo še elektrostatično energijo v sistemu
+\begin{equation*}
+	E=\sum_{i{,}j}E_{i{,}j}=\sum_{i{,}j>i} \frac{e_0^2}{4\pi \epsilon_0 \|r_i - r_j\|}.
+\end{equation*}
+Tak problem minimizacije lahko rešimo z metodo \texttt{SLSQP}, ki je na voljo pod funkcijo \texttt{scipy.optimize.minimize}.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{sphere10charges.pdf}
+        \caption{$10$ elektronov.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{sphere50charges.pdf}
+        \caption{$50$ elektronov.}
+    \end{subfigure}
+    \caption{Porazdelitev elektronov na sferi za $10$ in $50$ elektronov.}
+    \label{fig:basic}
+\end{figure}
+Na sliki \ref{fig:basic} je razvidno, da algoritem elektrone razporedi po celotni sferi čim bolj homogeno, kar pričakovano predstavlja minimum energije. V nadaljevanju lahko problem še razširimo tako, da v problem uvedemo več krogel in na vsako postavimo določeno število elektronov.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3eq.pdf}
+        \caption{Sfere z $10$ elektroni.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3neq.pdf}
+        \caption{Sfere z $10$, $15$ in $20$ elektroni.}
+    \end{subfigure}
+    \caption{Porazdelitev elektronov na treh enako oddaljenih sferah.}
+    \label{fig:multi}
+\end{figure}
+Na sliki \ref{fig:multi} tako dobimo razporeditev elektronov na večih sferah. A iz trenutne vizualizacije ne razberemo prav veliko zato projeciramo površino vsake izmed sfer v dve dimenziji in pogledamo razporeditev elektronov. V primeru, kjer imajo vse sfere enako število elektronov na sliki \ref{fig:multi2Deq}, je na vseh sferah enak vzorec, ki je le rahlo zamaknjen glede na relativno pozicijo na drugi dve sferi. Torej v smeri, ki je obrnjena proti drugima dvema sferama se ustvari nekakšna `vrzel` na površini. Na nasprotni strani pa se ustvari vzorec, kjer sta dva elektrona obkrožena s šestimi.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3eq0.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3eq1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3eq2.pdf}
+    \end{subfigure}
+    \caption{Porazdelitev elektronov na projekcij površin treh enako oddaljenih sfer, kjer imajo vse sfere $10$ elektronov.}
+    \label{fig:multi2Deq}
+\end{figure}
+\newpage
+Na sferah z različnim številom elektronov na sliki \ref{fig:multi2Dneq} so rezultati precej bolj zanimivi. V primeru z $10$ elektroni se jasno razbere lok elektronov, ki gre čez `pola` sfere. Pričakovano glede na najmanjše število elektronov pa je `vrzel` elektronov na tej sferi največja. Na sferi s $15$ elektroni je vzorec precej podoben tistemu, ki je nastal v primeru z enakim številom elektronov. Pri sferi z $20$ elektroni pa je `vrzel` elektronov zelo majhna in elektroni razporedijo po večini površine. To je pričakovano, saj je sfera z največ elektroni tudi energijsko najdražja.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3neq0.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3neq2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{spheres3neq1.pdf}
+    \end{subfigure}
+    \caption{Porazdelitev elektronov na projekcij površin treh enako oddaljenih sfer, kjer imajo sfere $10$, $15$ in $20$ elektronov.}
+    \label{fig:multi2Dneq}
+\end{figure}
+Za primerjavo Powellove in Nelder-Mead minimizacijske metode potrebujemo problem rahlo prepisati, saj ti dve metodi ne podpirata vezi. Koordinate na sferi lahko zapišemo kot
+\begin{align*}
+	x &= r \sin{\theta}\cos{\varphi}, \\
+	y &= r \sin{\theta}\sin{\varphi}, \\
+	z &= r \cos{\theta}.
+\end{align*}
+Z uporabo prej definiranih vezi radius fiksiramo na $r=1$ in tako zmanjšamo število parameterov iz $3N$ na $2N$. Kljub zmanjšanemu številu parametrov pa ta sprememba ni preveč ugodna, saj se računanje elektrostatične energije precej upočasni, zaradi počasnosti operacij $\sin$ in $\cos$. Namesto, da ponovimo že rešeno nalogo lahko metodi primerjamo na primeru vijačnice z obročem, ki jo parametriziramo s sledečim
+\begin{align*}
+	x &= \cos{t} + R\cos{\phi}\cos{t} - \frac{R}{\sqrt{2}}\sin{\phi}\sin{t}, \\
+	y &= \sin{t} + R\cos{\phi}\sin{t} + \frac{R}{\sqrt{2}}\sin{\phi}\cos{t}, \\
+	z &= t - \frac{R}{\sqrt{2}}\sin{\phi}.
+\end{align*}
+Podobno kot pri sferi tudi pri vijačnici z obročem fiksiramo $R=0.1$ in imamo $2N$ parametrov. Da se vijačnica ne nadaljuje v neskončnost imamo dve možnosti pri računanju energije. Ena možnost je, da parameter $t$ moduliramo po željeni dolžini. Druga možnost pa je, da izven dovoljenih vrednosti energijo nastavimo na neskončno in se tako algoritem izogne tem vrednostim. 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{infinity.pdf}
+        \caption{Neskončna energija izven veljavnega območja parametra $t$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{cycle.pdf}
+        \caption{Cikličen parameter $t$.}
+    \end{subfigure}
+    \caption{Porazdelitev $30$ elektronov na spirali z različnima pristopoma do omejitve parametra $t$.}
+    \label{fig:spirals}
+\end{figure}
+Na sliki \ref{fig:spirals} rezultata izgledata precej podobno in ne opazimo večjih razlik. A po bolj podrobni analizi na sliki \ref{fig:spirals_diff} opazimo, da to ni popolnoma res. Presenetljivo metoda s cikličnostjo potrebuje manj iteracij, da pride do zadovoljive rešitve. Pričakovali bi ravno obratno, saj z neskončno energijo domeno omejimo na manjše območje. Vsota razlik pa se linearno dviguje, to lahko pojasnimo s tem, da za vsak parameter zahtevamo natančnost $\epsilon$. Število parametrov pa narašča linearno v odvisnosti od števila elektronov in se tako odvisnost prenese. 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{iterations.pdf}
+		\caption{Povprečna razlika iteracij.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{diffs.pdf}
+        \caption{Povprečna absolutna razlika rezultata.}
+    \end{subfigure}
+	\caption{Povprečje petih razlik med rezultati metode \texttt{Powell} v odvisnosti od števila elektronov pri uporabi neskončne energije in cikličnosti za omejitev parametra $t$.}
+    \label{fig:spirals_diff}
+\end{figure}
+Še ena možnost, ki se nam ponuja s cikličnostjo je, da ko parameter $t$ preide izven dovoljenega območja ga prenesemo na drugo vijačnico z obročem. Slika \ref{fig:double} predstavlja ta rezultat.
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=0.6\textwidth]{doubletrouble.pdf}
+	\caption{Rezultat za dve vijačnici, kjer elektroni na njunem koncu preidejo na drugo.}
+    \label{fig:double}
+\end{figure}
+Spiralo smo začeli risati zato, da bi lahko primerjali medtod \texttt{Powell} in \texttt{Nelder-Mead}, a kot se je izkazalo na sliki \ref{fig:Nelder-Mead} metoda \texttt{Nelder-Mead} deluje veliko slabše in počasnejše od metode \texttt{Powell}. Za eno vijačnico z obročem metoda vedno uspešno konča, a je tudi ta uspeh precej daleč od idealnega. Pri dveh vijačnicah z obročem pa neuspeh in uspeh izgledata precej bolj podobno kot bi pričakovana rešitev. S tem lahko zaključimo, da je metoda \texttt{Powell} za naš problem precej boljša.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{nelder-mead-success.pdf}
+		\caption{Dve vijačnici z obročem ob uspešnem koncu.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{nelder-mead-fail.pdf}
+		\caption{Dve vijačnici z obročem ob neuspešnem koncu.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.35\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{nelder-mead-single.pdf}
+		\caption{Vijačnica z obročem ob uspešnem koncu.}
+    \end{subfigure}
+	\caption{Rezultati metode Nelder-Mead.}
+    \label{fig:Nelder-Mead}
+\end{figure}
+\section{Optimalna vožnja čez semafor}
+Problem optimalne vožnje enako kot v prvi nalogi formuliramo z naslednjo funkcijo in vezjo
+\begin{align*}
+	\mathcal{L} &= \int^1_0(\dot{v}^2-\lambda v)dt & 1 &= \int_0^1vdt,
+\end{align*}
+kjer funkcijo $\mathcal{L}$ minimiziramo. Parametri našega reševanja so hitrost ob različnih časih $v(t_1), v(t_2)\dots v(t_n)$. Našo minimizacijsko funkcijo tako prepišemo v diskretno obliko
+\begin{equation*}
+	\mathcal{L} = \sum_{i=0}^{n-1}\left(\left(\frac{v_{i+1} - v_i}{dt}\right)^2-\lambda v_i\right)dt.
+\end{equation*}
+Da zadostimo vezi pa poiščemo Lagrangeev multiplikator $\lambda$ z bisekcijo tako, da velja
+\begin{equation*}
+	1 = \sum_{i=0}^{n}v_i dt.
+\end{equation*}
+Numerično reševanje na tak način vrne rešitve, ki se približno ujemajo z analitičnimi rešitvami izračunanimi v prvi nalogi. Kot je razvidno na sliki \ref{fig:drivedrive} pa je numerična rešitev na veliko točkah rahlo prelomljena kar je posledica premalo kosov časovnega intervala, katerih je bilo v tem primeru $100$.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{analytical.pdf}
+		\caption{Analitična rešitev.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{numerical.pdf}
+		\caption{Numerična rešitev.}
+    \end{subfigure}
+	\caption{Rešitev problema optimalne vožnje.}
+	\label{fig:drivedrive}
+\end{figure}
+Pri reševanju omejimo še hitrost s členom v funkciji $\mathcal{L}$ in sicer $\sum_i^n \exp{(\beta \max(0, \|v_i\| - v_{lim}))} - 1$. S čemer poskrbimo, da je funkcija $\mathcal{L}$ za zelo velike presežke hitrosti tudi zelo velika in zato algoritem izključi rešitve, ki presežejo omejitev. Spomnimo se še, da so rešitve, ki imajo v zadnjem delu negativno hitrost neveljavne, saj ne moremo zapeljati čez semafor in se vrniti ob zeleni luči. Zato lahko alternativno uvedemo člen $\sum_i^n \exp{(\beta \max(0, -v_i))} - 1$. S tem podobno kot prej dosežemo, da kaznujemo negativne hitrosti in se jim izognemo.
+\newpage
+Na sliki \ref{fig:speed_limit}, kjer postavimo omejitev hitrosti nam pokaže slabosti takega reševanja. Začetne hitrosti višje od $3$ so namreč popolnoma neveljavne rešitve, ki precej prehitro preidejo semafor. Razlog za to leži v tem, da se algoritem za minimizacijo zaradi zelo velikih vrednosti zatakne v lokalnem minimumu in posledično tudi algoritem za bisekcijo s spreminjanjem $\lambda$ slabo vpliva na vrednost celotne funkcije in tako ne more najti optimuma. Pri reševanju za prepoved negativnih hitrosti na sliki \ref{fig:nozero} smo to dosegli oziroma skoraj dosegli za vse primere razen $v_0=5$. A smo podobno kot prej se zataknili v lokalnem minimumu in s tem izgubili pravilnost rešitev.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{speednumerical.pdf}
+		\caption{Rešitev s postavljeno omejitvijo hitrosti s členom $\sum_i^n \exp{(\beta \max(0, \|v_i\| - v_{lim}))} - 1$.}
+		\label{fig:speed_limit}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{nozeronumerical.pdf}
+		\caption{Rešitev s prepovedjo negativnih hitrosti s členom $\sum_i^n \exp{(\beta \max(0, -v_i))} - 1$.}
+		\label{fig:nozero}
+    \end{subfigure}
+	\caption{Rešitev problema optimalne vožnje skozi semafor z dodatnimi členi kot omejitvami.}
+\end{figure}
+Reševanje z bisekcijo je precej neučinkovito zato se ji z dodatnim členom lahko poskusimo izogniti. Ta člen sestavimo sledeče $\exp{(\beta((1 - (0.5v_0 + 0.5v_n + \sum_i^{n-1}v_i)dt)^2})$. 
+\begin{figure}[H]
+    \centering
+	\includegraphics[width=0.45\textwidth]{distnumerical.pdf}
+	\caption{Rešitev problema optimalne vožnje skozi semafor z razdaljo določeno s členom $\exp{(\beta((0.5v_0 + 0.5v_n + \sum_i^{n-1}v_i)dt)^2})$.}
+    \label{fig:dist}
+\end{figure}
+\newpage
+Tako smo na sliki \ref{fig:dist} dobili precej podobne rešitve analitičnim. V tabeli \ref{tab:dist} preverimo za koliko razdalja odstopa od zahtevane (zahtevamo razdaljo 1). Pričakovano omejitev s tem členom najbolje deluje za začetno hitrost $v_0=1$, ki mora glede na analitično rešitev ostati enaka čez celotno vožnjo. V splošnem pa odstopanje narašča glede na oddaljenost od te idealne začetne hitrosti.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{c c}
+	\hline
+		$v_0$ & $1 - (0.5v_0 + 0.5v_n + \sum_i^{n-1}v_i)dt$ \\
+	\hline
+	$-1$ & $0.110$ \\
+	$0$  & $0.061$ \\
+	$1$  & $-0.033$ \\
+	$2$  & $-0.064$ \\
+	$3$  & $-0.104$ \\
+	$4$  & $-0.144$ \\
+	$5$  & $-0.146$ \\
+	\hline
+	\end{tabular}
+	\caption{Odstopanje od pričakovane razdalje glede na začetno hitrost $v_0$.}
+	\label{tab:dist}
+\end{table}
+\section{Zaključek}
+V tej nalogi smo se spoznali z numeričnim reševanjem nelinearnih problemov. Najprej smo si pogledali minimizacijo elektrostatične energije na sferi in vijačnici z obročem. Nato smo se vrnili k problemu iz prve naloge in si pogledali še kako lahko tak problem rešimo numerično namesto analitično. Na podlagi te naloge  smo spoznali tudi kako zadostiti vezem z bisekcijo in dodajanjem členov kot kazni v funkcijo, ki jo minimiziramo.
+\end{document}
