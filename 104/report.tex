@@ -1,0 +1,336 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[slovene]{babel}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{rotating} 
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage[margin=3cm]{geometry}
+\graphicspath{{./images/}}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\title{Modelska Analiza 1 \\[3mm] \large 4. naloga}
+\author{Luka Papež\\28221030}
+\date{}
+
+\begin{center}
+    \includegraphics[width=8cm]{logo-fmf.png}
+\end{center}
+
+{
+    \let\newpage\relax
+    \maketitle
+}
+
+\newpage
+\section{Naloga - Populacijski modeli}
+\begin{enumerate}
+    \item Model epidemije: populacijo razdelimo v tri razrede: (D) zdravi in dovzetni, (B) bolni in
+    kliconosni, (I) imuni: nedovzetni in nekliconosni. Bolezen se širi s stiki med zdravimi in bolnimi.
+    Bolnik preide s konstantno verjetnostjo med imune (ozdravi ali umre).
+	\begin{align}
+		\dot{D} &= -\alpha D B, &
+		\dot{B} &= +\alpha D B - \beta B, &
+		\dot{I} &= \beta B.
+		\label{eq:bolezni}
+   	\end{align}
+    V epidemiji nas zanima njen vrh (maksimalno trenutno število obolelih), čas nastopa maksimuma
+    in celotno število obolelih. S cepljenjem lahko vnaprej preselimo določen del populacije med
+    imune. Kako vpliva delež cepljenih na parametre epidemije?
+    Kako se spremeni potek epidemije, če obolele razdeliš na več stadijev okužbe? Poskusiš lahko s
+    3 stadiji: najprej so okuženi, a ne širijo epidemije (inkubacijska doba), potem so močno kužni,
+    potem pa so v izolaciji in jim kužnost pade.
+
+    \item Preuči standardni deterministični model zajci-lisice (model Lotka-Volterra) v obliki
+	\begin{align}
+		\dot{Z} &= \alpha Z - \beta Z L, &
+		\dot{L} &= -\gamma L + \delta Z L.
+		\label{eq:lotka}
+	\end{align}
+    Nariši in preišči fazni diagram (brezdimenzijska oblika, zastojne točke, stabilnost \ldots).
+    Oglej si obhodne dobe v odvisnosti od začetnega stanja. Zadošča, da preiščeš stanja, v
+    katerih ima ena komponenta ravnovesno vrednost.
+
+    \item Analiziraj fazni portret za populacijski model laserja s konstantnim črpanjem.
+	\begin{align}
+		\dot{f} &= -\alpha f + B_1 a f, &
+		\dot{a} &= -\beta a - B_2 a f + R.
+		\label{eq:laser}
+	\end{align}
+    Določi ravnovesno stanje v odvisnosti od moči črpanja. Kako se s tem parametrom spreminjata
+    frekvenca in karakteristični čas relaksacijskih oscilacij?
+\end{enumerate}
+\section{Model epidemije}
+Model epidemije opišemo z enačbami \eqref{eq:bolezni}, kjer definiramo konstanti $\alpha$ in $\beta$, ki opisujeta hitrost širjenja bolezni in zdravljenja. Za lažjo obravnavo še postavimo količino celotne populacije na $1$ oziroma, da ob vseh trenutkih velja $D + B + I=1$. Da se populacija ohranja tudi ob razvoju skozi čas  potrdimo z lastnostjo $\dot{D} + \dot{B} + \dot{I} = 0$. S tem lahko narišemo preproste grafe poteka epidemije.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{basic.pdf}
+		\caption{Parametra nastavljena na $\alpha = 1$ in $\beta=0.1$.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{basic1.pdf}
+		\caption{Parametra nastavljena na $\alpha= 0.5$ in $\beta=0.1$.}
+    \end{subfigure}
+    \caption{Poteka epidemije pri različnih vrednostih parametra.}
+    \label{fig:both_epidemics}
+\end{figure}
+Za raziskovanje maksimuma trenutnega števila obolelih uvedimo reprodukcijsko število $R=\alpha D_0 / \beta$ in narišimo graf velikosti maksimuma od reprodukcijskega števila na sliki \ref{fig:maximums}. Na tem grafu opazimo, da se maksimalno število obolelih ne poveča dokler reprodukcijsko število ne preseže vrednosti $1$ nato začne eksponentno naraščati. Rast se nato umiri pri vrednosti reprodukcijskega števila $2.5$. Pri točki $2.5$ na grafu na sliki \ref{fig:sums} opazimo, da zboli približno polovica celotnega prebivalstva. 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{maximums.pdf}
+		\caption{Maksimum trenutnega števila obolelih v odvisnosti od reprodukcijskega števila.}
+		\label{fig:maximums}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{sums.pdf}
+		\caption{Celotno število obolelih v odvisnosti od reprodukcijskega števila.}
+		\label{fig:sums}
+	\end{subfigure}
+\end{figure}
+Na sliki \ref{fig:both_epidemics} opazimo tudi, da se vrh števila trenutno bolanih zgodi kmalu po tem, ko je število zdravih (D) in bolanih (B) enako. Za boljše razumevanje narišimo še čas maksimuma po začetku in po enakem številu obolelih in zdravih, če se to zgodi. Opazimo na slikah \ref{fig:maximum_times} in \ref{fig:after_equality}, da se maksimum pri $R<1$ zgodi že takoj na začetku in se torej epidemija nikoli ne zgodi, saj kot smo že opazili število trenutno obolelih pada. Po tem dobimo kratko območje naraščanja, kjer je naraščanje obolelih zelo počasno oziroma je epidemija zelo dolga. Pri reprodukcijskem številu $3$ pa se tudi zgodi, da je več ljudi trenutno bolanih (B) kakor pa zdravih (D), kar zanimivo približno ustreza tretjini . Čas med maksimum in enakim številom zdravih (D) in obolelih (B) se nato viša do točke, kjer maksimum preseže polovico prebivalstva.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{maximumt.pdf}
+		\caption{Čas maksimuma trenutnega števila obolelih v odvisnosti od reprodukcijskega števila.}
+		\label{fig:maximum_times}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{afterequalityt.pdf}
+		\caption{Čas med maksimumom trenutnega števila obolelih in enakim številom zdravih (D) in obolelih (B) v odvisnosti od reprodukcijskega števila.}
+		\label{fig:after_equality}
+	\end{subfigure}
+\end{figure}
+\newpage
+Pogledamo lahko tudi primer, ko po času $t_0$ začnemo s cepljenjem in tako premaknemo zdrave (D) med cepljene (V). Tak sistem opišemo z naslednjimi enačbami
+\begin{align}
+	\dot{D} &= -\alpha D B - \gamma D H(t_0), &
+	\dot{B} &= \alpha D B - \beta B, &
+	\dot{I} &= \beta B, &
+	\dot{V} &= \gamma D H(t_0).
+\end{align}
+Prva stvar, ki nas zanima je seveda za koliko zmanjšamo obremenitev zdravstva oziroma z drugimi besedami maksimum števila trenutno bolanih. Na primeru na sliki \ref{fig:vacc_diff} opazimo, da cepljenje najbolj zmanjša število bolanih ljudi na enkrat okoli reprodukcijskega števila $3$. Ko pogledamo relativno vrednost maksimuma pa ugotovimo, da ga najbolj zmanjša pri reprodukcijskem številu $2$ in to skoraj za $80\%$.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{vaccmax.pdf}
+		\caption{Razlika med maksimumom števila trenutno bolanih brez cepljenja in s cepljenjem pri $t_0=10$ za obdobje epidemije $t=100$ za \gamma=0.1.}
+		\label{fig:vacc_diff}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{vaccmaxrel.pdf}
+		\caption{Relativna razlika med maksimumom števila trenutno bolanih brez cepljenja in s cepljenjem pri $t_0=10$ za obdobje epidemije $t=100$ za \gamma=0.1.}
+		\label{fig:vacc_diff_rel}
+	\end{subfigure}
+\end{figure}
+Seveda pa nas v praksi najbolj zanima kdaj se bo epidemija končala. Glede na prejšnje ugotovitve vemo, da se epidemija ne začne, če je $R < 1$. Na podlagi tega uvedemo efektivno reprodukcijsko število $R_{eff}(t)=\alpha D(T)/\beta$ in definiramo konec epidemije, ko je vrednost tega pod $1$. 
+
+Z risanjem grafa dolžine epidemije v odvisnosti od reprodukcijskega števila nam razkrije, da ima to enako odvisnost kot čas do maksimuma števila trenutno bolanih. Na sliki \ref{fig:epidemic_length} je graf časa konca epidemije v odvisnosti od časa začetka cepljenja. Tako dolžina epidemije kot velikost maksimuma števila trenutno bolanih ima enako odvisnost in sicer najprej dolžina ter velikost linearno naraščata z začetkom cepljenja. Nato pa se ustali na konstanti vrednosti, ker je bilo cepljenje prepozno in se je bolezen že preveč razširila.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.43\textwidth}
+		\includegraphics[width=\textwidth]{epidemiclengthnorm.pdf}
+		\caption{Dolžina epidemije v odvisnosti od R brez cepljenja pri $\gamma=0.1$.}
+		\label{fig:epidemic_length_norm}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.43\textwidth}
+		\includegraphics[width=\textwidth]{epidemiclength.pdf}
+		\caption{Dolžina epidemije v odvisnosti od začetka cepljenja $t_0$ pri $R=3$ in $\gamma=0.1$.}
+		\label{fig:epidemic_length}
+	\end{subfigure}
+\end{figure}
+Enaka odvisnost med dolžino epidemije in časom maksimuma števila trenutnih bolanih se prenese enaka odvisnost tudi pri odvisnosti od časa začetka cepljenja kar vidimo na sliki \ref{fig:epidemic_max_vac}. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{epidemiclengtht.pdf}
+	\caption{Maksimum števila trenutno bolanih v odvisnosti od začetka cepljenja $t_0$ pri $R=3$ in $\gamma=0.1$.}
+	\label{fig:epidemic_max_vac}
+\end{figure}
+Potek bolezni lahko razdelimo tudi na več faz na primer zdravi (D), hudo bolni (S), bolni (B), imuni (I) ter mrtvi (M). Za tak sistem enačbe napišemo sledeče
+\begin{align}
+	\dot{D} &= -\alpha D B - \beta D S, &
+	\dot{S} &= \alpha D B + \beta DS - (\gamma + \delta) S, &
+	\dot{B} &= \gamma S - \epsilon B, &
+	\dot{I} &= \epsilon B, &
+	\dot{M} &= \delta S.
+\end{align}
+Za potrebe reprodukcijskega in efektivnega reprodukcijskega števila definiramo R=(\alpha + \beta)D/(\gamma + \delta + \epsilon). Na sliki \ref{fig:basic_multi} imamo potek epidemije za določene parametre, kjer je zanimivo kako je najprej velik delež populacije hudo bolnih (S) nato pa se to prelevi le  v bolnost (B) zaradi počasnega ozdravljanja iz te faze. Zanimiva je tudi opazka kako na sliki \ref{fig:deadmen} najprej število mrtvih v odvisnosti od reprodukcijskega števila hitro narašča nato pa se ustali na malo pod $9\%$ populacije.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.43\textwidth}
+		\includegraphics[width=\textwidth]{basicstag.pdf}
+		\caption{Potek epidemije z več fazami bolezni.}
+		\label{fig:basic_multi}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.43\textwidth}
+		\includegraphics[width=\textwidth]{stagdeaths.pdf}
+		\caption{Število smrti v epidemiji v odvisnosti od reprodukcijskega števila.}
+		\label{fig:deadmen}
+	\end{subfigure}
+\end{figure}
+\newpage
+Pogledamo si lahko tudi maksimume in čas pojava le teh. Iz slike \ref{fig:stagmaximums} razberemo, da je delež bolnih le malo višji pri določenih reprodukcijskih številih. Kot vidimo na sliki \ref{fig:stagmaxt} se maksimumi pojavijo precej kasneje v primerjavi s tistimi na sliki \ref{fig:maximum_times}, kar nakazuje precej daljšo epidemijo od tiste s preprostejšim modelom.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.43\textwidth}
+		\includegraphics[width=\textwidth]{stagmaximums.pdf}
+		\caption{Vrednost maskimuma seštevka hudo bolnih in bolnih v odvisnosti od reprodukcijskega števila.}
+		\label{fig:stagmaximums}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.43\textwidth}
+		\includegraphics[width=\textwidth]{stagmaxt.pdf}
+		\caption{Čas do maksimuma seštevka hudo bolnih in bolnih v odvisnosti od reprodukcijskega števila.}
+		\label{fig:stagmaxt}
+	\end{subfigure}
+\end{figure}
+\section{Določanje parametrov glede na podatke iz COVID Sledilnika}
+Da bi določili parametre dejanskega sistema in ugotovili tudi kako se sistem v celoti obnaša smo najprej zastavili enačbe 
+\begin{align*}
+	\dot{D}&=-\alpha DB - \gamma D + \epsilon (I + V), & \dot{B} &= \alpha DB - \beta B - \delta B, & \dot{I} &= \beta B - \epsilon I, & \dot{V} &= \gamma D - \epsilon V, & \dot{M} = \delta B.
+\end{align*}
+Ideja je bila, da bi lahko s tem sistemom opisali celotno epidemijo. A se je ta sistem izkazal za preveč zahtevnega in smo s postopnim poenostavljanjem končali na osnovnem modelu \eqref{eq:bolezni}. Za bolj primerljivo dinamiko z modelom smo se omejili na prvih $300$ dni, kjer je bila rast eksponenta in se je proti koncu umirila. 
+S tem smo tako postavili parametre $\alpha_n$ in $\beta_n$, ki jih variramo. Za primer na sliki \ref{fig:actual} je bil vsak par parametrov odgovoren za $30$ dni in smo tako imeli $20$ parametrov. 
+Za vgrajeno metodo \texttt{scipy.optimize.least\_squares} smo nato iz podatkov iz COVID sledilnika vzeli podatek o novih potrjenih primerih $C$, ki smo ga normalizirali s populacijo Slovenije $2000000$ in definirali sledečo funkcijo 
+\begin{equation*}
+	\mathcal{L}_1 = (\dot{B} - C)^2.
+\end{equation*}
+S prilagajanjem začetnih vrednosti parametrov uspemo zajeti dinamiko dejanskih podatkov. Glavna napaka je predvsem razlika v eksponentni rasti. Zelo lepo pa se ujema vrh, kjer naša rešitev preide natanko čez sredino rahlo zašumljenih podatkov.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{actual.pdf}
+	\caption{Rešitev trenutnega števila bolnih (B) minimizacije $20$ parametrov glede na podatke.}
+	\label{fig:actual}
+\end{figure}
+\section{Model Lotka-Volterra}
+Model Lotka-Volterra je standardni model opisa sistema plen-lovec in je definiran z enačbami \eqref{eq:lotka}. Ta sistem lahko poenostavimo tako, da uvedemo novi spremenljivki $l=\beta / \alpha L$ in $z=\delta / \gamma Z$, kar nam definira sistem 
+\begin{align*}
+	\dot{z} &= \alpha z (1 - l), & \dot{l} &= \gamma l (z - 1).
+\end{align*}
+Z reskaliranjem časa $\mathcal{T}=t\sqrt{\alpha \gamma}$ in uvedbo še ene nove spremenljivke $p=\sqrt{\alpha/\gamma}$ pa sistem postane enoparametričen
+\begin{align*}
+	\dot{z} &= pz(1 - l), & \dot{l} &= \frac{l}{p}(z - 1).
+\end{align*}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{lotka0.pdf}
+		\caption{Parameter $p=0.7$.}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{lotka1.pdf}
+		\caption{Parameter $p=0.01$.}
+	\end{subfigure}
+	\caption{Primer populacije lisic in zajcev skozi čas.}
+	\label{fig:lotka}
+\end{figure}
+Iz takega sistema dobimo periodične rešitve kot na sliki \ref{fig:lotka}. Rešitve lahko narišemo tudi v obliki faznega diagrama kot na sliki \ref{fig:phase}. Na faznem diagramu opazimo, da rešitve oscilirajo okoli točke $(z, l) = (1, 1)$. To pojasnimo s stacionarnima točkama sistema, ki jih določimo z $\dot{z}=0$ in $\dot{l}=0$. Ena izmed točk je $(0, 0)$, kjer nobena izmed populacij ne obstaja in se zato nobena ne manjša oziroma narašča. Druga točka je $(1, 1)$, kjer sta populaciji v sožitju in velikostih obe ohranjata konstantno vrednost.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{phase0.pdf}
+		\caption{Parameter $p=0.01$.}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{phase1.pdf}
+		\caption{Parameter $p=0.7$.}
+	\end{subfigure}
+	\caption{Fazni diagram ob variranju $z_0$ in fiksnem $l_0=1$.}
+	\label{fig:phase}
+\end{figure}
+Zanimiv je tudi problem z vrednostjo $p=0.01$ in $l_0=0.85$ pri katerem zaradi majhnosti parametra $p$ lisice praktično izumrejo in populacija zajcev efektivno linearno narašča. Nato pa velikost zajcev preseže $1$ in populacija lisic se s tem nenadno poveča. Zarad pomanjkanja zajcev pa se nato ponovno strmo upade.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{lotka2.pdf}
+	\caption{Populacija lisic in zajcev skozi čas pri začetnih pogojih $z_0=1.5$, $l_0=0.85$ in parametru $p=0.01$.}
+	\label{fig:singularity}
+\end{figure}
+\newpage
+Bolje nam ta pojav razloži tudi graf gradientov v faznem diagramu na sliki \ref{fig:phase_grad}. Pri parametru $p=0.7$ so prehodi zvezni in ni tako ekstremnih spremeb. Pri parametru $p=0.01$ pa se gradient nad $z=1$ na enkrat obrne kar povzroči tako velik prehod. Lepo se vidi tudi konstanten odvod pri $l=0$, kjer populacija zajcev linearno narašča.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{phase2.pdf}
+		\caption{Parameter $p=0.7$.}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\includegraphics[width=\textwidth]{phase3.pdf}
+		\caption{Parameter $p=0.01$.}
+	\end{subfigure}
+	\caption{Gradienti v faznem diagramu.}
+	\label{fig:phase_grad}
+\end{figure}
+Periode rešitev so najnižje v okolici točke $(1, 1)$, kjer je perioda nič, saj je tam populacija zajcev in lisic konstantna. V sami točki $(1, 1)$ oziroma že v njeni ožji okolici pa program ne najde rešitve. Podobno bi bilo v točki $(0, 0)$ a tam ne iščemo periode. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{periods.pdf}
+	\caption{Periode rešitev pri $p=0.7$}
+	\label{fig:periods}
+\end{figure}
+\newpage
+\section{Populacijski model laserja}
+Populacijski model laserja opišemo  z enačbami \eqref{eq:laser}. Za nadaljno obravnavo predpostavimo, da imajo vsi nivoji enako degeneracijo torej predpostavimo, da velja $B_1=B_2=B$. Podobno kot v prejšnjem poglavju jih želimo prepisati v obliko z enim parametrom. To storimo po enakem postopku z uvedbo novih spremenljivk in reskaliranjem časa $\mathcal{F}=B/\beta f$, $\mathcal{A}=B/\alpha a$, $\mathcal{T}=t\sqrt{\alpha\beta}$ in na koncu uvedemo še končna parametra $p=\sqrt{\alpha / \beta}$, $\mathcal{R}=\frac{B}{\alpha \beta}R$.
+\begin{align*}
+	\dot{\mathcal{F}} &= p\mathcal{F}(\mathcal{A} - 1), & \dot{\mathcal{A}} = - \frac{\mathcal{A}}{p}(1 + \mathcal{F}) + \frac{\mathcal{R}}{p}.
+\end{align*}
+V naslednjem koraku poiščemo ravnovesno stanje. Prvi pogoj $\dot{\mathcal{F}}=0$ nam da dve rešitvi $\mathcal{A}=1$ in $\mathcal{F}=0$. S pogojem $\dot{\mathcal{A}}=0$ pa dobimo predpis $\mathcal{R}=\mathcal{A}(1 - \mathcal{F})$. Ob upoštevanju prejšnjega pogoja imamo tako dve rešitvi
+\begin{align*}
+	\mathcal{F}=0 \quad &\Rightarrow \quad \mathcal{R}=\mathcal{A}, \\
+	\mathcal{A}=1 \quad &\Rightarrow \quad \mathcal{R}=1+\mathcal{F}.
+\end{align*}
+Prva stacionarna točka ustreza stanjem, ko je $R$ pod pragom, drugo pa ko je nad pragom in laser deluje. Te točki se tudi jasno izoblikujeta z gradienti v faznem diagramu na sliki \ref{fig:laserphase}, kjer vidimo kako se izolira območje, kjer je $\mathcal{F}=0$ in kako preostalo območje kaže v smeri stacionarne točke z $\mathcal{A}=1$.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{laserphase.pdf}
+	\caption{Gradienti modela laserja v faznem diagramu pri vrednosti parametrov $p=1$ in $R=0.5$.}
+	\label{fig:laserphase}
+\end{figure}
+Za analizo relaksacijskih oscilacij najprej zapišemo Jakobijansko matriko
+\begin{equation*}
+	J(A, F)=\begin{pmatrix}
+p(A-1) & pF \\[6pt]
+		-\dfrac{\mathcal{A}}{p} & -\dfrac{1+\mathcal{F}}{p}
+\end{pmatrix}.
+\end{equation*}
+Za izračun njenih lastnih vrednosti moramo rešiti naslednjo kvadratno enačbo
+\begin{equation}
+	\lambda^2	- \lambda \left(p(1-\mathcal{R}) + \frac{\mathcal{F} + 1}{p}\right) + (1 - \mathcal{R})(\mathcal{F} + 1) + \mathcal{AF} = 0.
+\end{equation}
+Enačbo rešimo v prej izračunanih stacionarnih točkah
+\begin{align}
+	(\mathcal{F}, \mathcal{A})=(0, \mathcal{R}) \quad &\Rightarrow \quad \lambda_1 = p(1-R), \lambda_2=\frac{1}{p} \label{eq:eigen0} \\
+	(\mathcal{F}, \mathcal{A})=(\mathcal{R} - 1, 1) \quad &\Rightarrow \quad \lambda=-\frac{\mathcal{R}}{2p} \pm \frac{1}{2}\sqrt{\frac{\mathcal{R}^2}{p^2}-4(\mathcal{R}-1)} \label{eq:eigen1}
+\end{align}
+Lastne vrednosti prve stacionarne točke \eqref{eq:eigen0} nam potrdijo, da tam ni oscilacij. Za drugo stacionarno točko \eqref{eq:eigen1} pa velja, da če je $\mathcal{R}^2/p^2<4(\mathcal{R}-1)$ in $0 < \mathcal{R}/2p$ potem pride do relaksacijskih oscilacij in sta frekvenca in karakteristični čas 
+\begin{align*}
+	\omega &= \frac{1}{2}\sqrt{4(\mathcal{R}-1) - \frac{\mathcal{R}^2}{p^2}}, & \tau = \frac{2p}{\mathcal{R}}.
+\end{align*}
+Če našo simulacijo rahlo izmaknmo iz stacionarne točke bi morali opaziti izračunano oscilacijo na sliki \ref{fig:relax}. Za izbrane parametre ustreza perioda $T=10.48$, ki je v našo simulaciji rahlo krajša. Precej nenavadno je tudi, da se po po tretjem vrhu amplituda veča. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\textwidth]{damped.pdf}
+	\caption{Relaksacijska oscilacija pri parameterih $p=2$, $R=1.5$.}
+	\label{fig:relax}
+\end{figure}
+\section{Zaključek}
+V tej nalogi smo se spoznali z modeliranjem sistemov s sistemom sklopljenih diferencialnih enačb. Z začetka smo si ogledali model simuliranja poteka epidemije in standarden mode Lotka-Volterra, ki smo jih preučili s pomočjo različnih metrik in faznih diagramov. Za konec pa smo si še pogledali populacijski model laserja in poiskali različne načine njegovega delovanja.
+\end{document}
