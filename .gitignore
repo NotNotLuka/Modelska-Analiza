@@ -1,5 +1,6 @@
 test.py
 logs/
 output/
+outputs/
 *.zip
 report.pdf
